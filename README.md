@@ -5,12 +5,12 @@ This is the source code for ***PVN3D: A Deep Point-wise 3D Keypoints Voting Netw
 
 
 ## Installation
-- Install CUDA9.0/CUDA10.0
+- Install CUDA9.0
 - Set up python environment from requirement.txt:
   ```shell
   pip3 install -r requirement.txt 
   ```
-- Install tkinter through ``sudo apt install python3-tk``
+- Install tkinter through ``sudo apt install python3-tk`` # python GUI工具
 - Install [python-pcl](https://github.com/strawlab/python-pcl).
 - Install PointNet++:
   ```shell
