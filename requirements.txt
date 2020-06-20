@@ -3,17 +3,17 @@ numpy
 torch==1.0.1.post2
 torchvision==0.2.0
 yaml
-pprint
-enum34
+pprint # 数据美化输出
+enum34 # The enum module from Python3.4 backported from 3.3 - 2.4
 future
 scipy==1.2.1
 opencv_contrib_python==3.4.2.16
 matplotlib==3.0.2
-transforms3d==0.3.1
-scikit_image==0.13.1
-lmdb==0.94
+transforms3d==0.3.1 # 用于3D变换,如旋转,缩放,剪切,投影
+scikit_image==0.13.1    # Python图像处理库
+lmdb==0.94  # key-value数据库,加快文件读取速度
 setuptools==39.1.0
-cffi==1.11.5
-easydict==1.7
+cffi==1.11.5    # 用于Python的C外部函数接口
+easydict==1.7   # 将字典值作为属性进行访问
 plyfile==0.6
-glumpy==1.0.6
+glumpy==1.0.6   #基于OpenGL的交互可视化库
