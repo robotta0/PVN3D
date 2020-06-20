@@ -16,4 +16,4 @@ setuptools==39.1.0
 cffi==1.11.5    # 用于Python的C外部函数接口
 easydict==1.7   # 将字典值作为属性进行访问
 plyfile==0.6
-glumpy==1.0.6   #基于OpenGL的交互可视化库
+glumpy==1.0.6   #基于OpenGL的交互可视化库,
