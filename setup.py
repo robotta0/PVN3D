@@ -22,13 +22,13 @@ setup(
                 "cxx": ["-O2", "-I{}".format("{}/include".format(_ext_src_root))],
                 "nvcc": [
                     "-O2", "-I{}".format("{}/include".format(_ext_src_root))
-                ],
+                ],  # GCC版本:5.4  ,NVCC版本:9.0 ,"-O2"编译器优化级别-进一步优化,
             },
-        )
-    ],
+        )   # 设置PyTorch的CUDA拓展编译配置,用C++来写接口函数和python相连，然后使用C++去调用cuda程序
+    ],  # 需要build的Python拓展
     cmdclass={
         'build_ext': BuildExtension
-    }
+    }   #
 )
 
 
