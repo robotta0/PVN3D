@@ -1,3 +1,5 @@
+# import os
+# import sys
 from collections import OrderedDict
 import math
 import random
@@ -5,7 +7,8 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 import torch.utils.model_zoo as model_zoo
-from common import Config
+from pvn3d.common import Config
+
 
 config = Config()
 

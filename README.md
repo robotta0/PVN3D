@@ -11,7 +11,7 @@ This is the source code for ***PVN3D: A Deep Point-wise 3D Keypoints Voting Netw
   pip3 install -r requirement.txt 
   ```
 - Install tkinter through ``sudo apt install python3-tk`` # python GUI工具
-- Install [python-pcl](https://github.com/strawlab/python-pcl).
+- Install [python-pcl](https://python-pcl-fork.readthedocs.io/en/latest/install.html#dependencies).
 - Install PointNet++:
   ```shell
   python3 setup.py build_ext

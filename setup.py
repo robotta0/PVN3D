@@ -2,6 +2,8 @@
 import os
 import glob
 from setuptools import setup
+import torch
+print(torch.__version__)
 from torch.utils.cpp_extension import BuildExtension, CUDAExtension
 
 
@@ -21,7 +23,7 @@ setup(
             extra_compile_args={
                 "cxx": ["-O2", "-I{}".format("{}/include".format(_ext_src_root))],
                 "nvcc": [
-                    "-O2", "-I{}".format("{}/include".format(_ext_src_root))
+                    "-O2", "-I{}".format("{}/include".format(_ext_src_root)), "-ccbin=/usr/bin/gcc"
                 ],  # GCC版本:5.4  ,NVCC版本:9.0 ,"-O2"编译器优化级别-进一步优化,
             },
         )   # 设置PyTorch的CUDA拓展编译配置,用C++来写接口函数和python相连，然后使用C++去调用cuda程序

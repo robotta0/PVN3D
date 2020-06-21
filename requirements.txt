@@ -1,8 +1,8 @@
 h5py
-numpy
+numpy~=1.18.5
 torch==1.0.1.post2
 torchvision==0.2.0
-yaml
+pyyaml
 pprint # 数据美化输出
 enum34 # The enum module from Python3.4 backported from 3.3 - 2.4
 future
@@ -17,3 +17,6 @@ cffi==1.11.5    # 用于Python的C外部函数接口
 easydict==1.7   # 将字典值作为属性进行访问
 plyfile==0.6
 glumpy==1.0.6   #基于OpenGL的交互可视化库,
+
+tqdm~=4.46.1
+pillow~=7.1.2

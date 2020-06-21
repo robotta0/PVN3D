@@ -6,6 +6,7 @@ from __future__ import (
     unicode_literals,
 )
 import torch
+print(torch.__version__)
 import torch.optim as optim
 import torch.optim.lr_scheduler as lr_sched
 import torch.nn as nn
@@ -18,22 +19,22 @@ import argparse
 import time
 import shutil
 import tqdm
-from lib.utils.etw_pytorch_utils.viz import *
-from lib import PVN3D
-from datasets.linemod.linemod_dataset import LM_Dataset
-from lib.loss import OFLoss, FocalLoss
-from common import Config
-from lib.utils.sync_batchnorm import convert_model
-from lib.utils.warmup_scheduler import CyclicLR
-from lib.utils.pvn3d_eval_utils import TorchEval
-import lib.utils.etw_pytorch_utils as pt_utils
+from pvn3d.lib.utils.etw_pytorch_utils.viz import *
+from pvn3d.lib import PVN3D
+from pvn3d.datasets.linemod.linemod_dataset import LM_Dataset
+from pvn3d.lib.loss import OFLoss, FocalLoss
+from pvn3d.common import Config
+from pvn3d.lib.utils.sync_batchnorm import convert_model
+from pvn3d.lib.utils.warmup_scheduler import CyclicLR
+from pvn3d.lib.utils.pvn3d_eval_utils import TorchEval
+import pvn3d.lib.utils.etw_pytorch_utils as pt_utils
 import resource
 from collections import namedtuple
 import pickle as pkl
 
 
 rlimit = resource.getrlimit(resource.RLIMIT_NOFILE)
-resource.setrlimit(resource.RLIMIT_NOFILE, (30000, rlimit[1]))
+resource.setrlimit(resource.RLIMIT_NOFILE, (30000, rlimit[1]))  # 将打开文件数量的软限制设为30000,硬限制保持默认
 
 parser = argparse.ArgumentParser(description="Arg parser")
 parser.add_argument(
