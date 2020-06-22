@@ -15,11 +15,15 @@ from torch.utils.data import DataLoader
 import pprint
 import os.path as osp
 import os
+import sys
+sys.path.insert(0, '/home/yumi/Project/6D_pose_estmation/PVN3D/pvn3d')
+sys.path.insert(0, '/usr/local/include/pcl-1.9')
+print(sys.path)
 import argparse
 import time
 import shutil
 import tqdm
-from pvn3d.lib.utils.etw_pytorch_utils.viz import *
+from lib.utils.etw_pytorch_utils.viz import *
 from pvn3d.lib import PVN3D
 from pvn3d.datasets.linemod.linemod_dataset import LM_Dataset
 from pvn3d.lib.loss import OFLoss, FocalLoss
@@ -35,6 +39,7 @@ import pickle as pkl
 
 rlimit = resource.getrlimit(resource.RLIMIT_NOFILE)
 resource.setrlimit(resource.RLIMIT_NOFILE, (30000, rlimit[1]))  # 将打开文件数量的软限制设为30000,硬限制保持默认
+                                                                # 防止打开文件过多导致系统崩溃
 
 parser = argparse.ArgumentParser(description="Arg parser")
 parser.add_argument(
