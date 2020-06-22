@@ -23,8 +23,10 @@ setup(
             extra_compile_args={
                 "cxx": ["-O2", "-I{}".format("{}/include".format(_ext_src_root))],
                 "nvcc": [
-                    "-O2", "-I{}".format("{}/include".format(_ext_src_root)), "-ccbin=/usr/bin/gcc"
-                ],  # GCC版本:5.4  ,NVCC版本:9.0 ,"-O2"编译器优化级别-进一步优化,
+                    "-O2", "-I{}".format("{}/include".format(_ext_src_root)), "-ccbin=/usr/local/bin/gcc"
+                ],  # GCC版本:7.3.0  ,NVCC版本:10.0 ,"-O2"编译器优化级别-进一步优化,
+                    # 一定要按照PyTorch官网推荐的命令安装PyTorch及其配套程序
+                    # GCC5.4版本位于/usr/bin/gcc
             },
         )   # 设置PyTorch的CUDA拓展编译配置,用C++来写接口函数和python相连，然后使用C++去调用cuda程序
     ],  # 需要build的Python拓展
