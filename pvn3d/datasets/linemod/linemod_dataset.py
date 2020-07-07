@@ -1,7 +1,9 @@
 #!/usr/bin/env python3
 import os
+
 import cv2
-import pcl
+
+
 import torch
 import os.path
 import numpy as np
@@ -11,9 +13,10 @@ from pvn3d.common import Config
 import pickle as pkl
 from pvn3d.lib.utils.basic_utils import Basic_Utils
 import yaml
-import scipy.io as scio
-import scipy.misc
 from cv2 import imshow, waitKey
+# import open3d as o3d
+# __all__ = [o3d]
+
 
 DEBUG = False
 
@@ -76,10 +79,10 @@ class LM_Dataset():
                 self.all_lst = self.tst_lst
         print("{}_dataset_size: ".format(dataset_name), len(self.all_lst))
 
-    def real_syn_gen(self, real_ratio=0.3):
-        if self.rng.rand() < real_ratio: # real
-            n_imgs = len(self.real_lst)
-            idx = self.rng.randint(0, n_imgs)
+    def real_syn_gen(self, real_ratio=1.0):
+        if self.rng.rand() < real_ratio: # self.rng = np.random
+            n_imgs = len(self.real_lst) # 真实数据的数量
+            idx = self.rng.randint(0, n_imgs)   # 将idx设置为0-n_imgs之间的整数
             pth = self.real_lst[idx]
             return pth
         else:
@@ -149,17 +152,28 @@ class LM_Dataset():
 
         return np.clip(img, 0, 255).astype(np.uint8)
 
+    # def get_normal(self, cld):  # 改成Open3D的
+    #     cloud = pcl.
+    #     cld = cld.astype(np.float32)
+    #     cloud.from_array(cld)
+    #     ne = cloud.make_NormalEstimation()
+    #     kdtree = cloud.make_kdtree()
+    #     ne.set_SearchMethod(kdtree)
+    #     ne.set_KSearch(50)
+    #     n = ne.compute()
+    #     n = n.to_array()
+    #     return n
+
     def get_normal(self, cld):
-        cloud = pcl.PointCloud()
-        cld = cld.astype(np.float32)
-        cloud.from_array(cld)
-        ne = cloud.make_NormalEstimation()
-        kdtree = cloud.make_kdtree()
-        ne.set_SearchMethod(kdtree)
-        ne.set_KSearch(50)
-        n = ne.compute()
-        n = n.to_array()
-        return n
+        cldShape = cld.shape
+        normal = np.random.random(cldShape)
+        return normal
+        #cloud = o3d.geometry.PointCloud()
+        #cld = cld.astype(np.float32)
+        #cloud.points = o3d.utility.Vector3dVector(cld)
+        # o3d.geometry.estimate_normals(cloud,
+        #                              search_param=o3d.geometry.KDTreeSearchParamKNN(50))
+        #print(cloud.normals)
 
     def add_real_back(self, rgb, labels, dpt, dpt_msk):
         real_item = self.real_gen()
@@ -188,8 +202,8 @@ class LM_Dataset():
         return rgb, dpt
 
     def get_item(self, item_name):
-        try:
-            if "pkl" in item_name:
+        try:        # 如果try中的语句块出现异常,执行except中的内容
+            if "pkl" in item_name:      #
                 data = pkl.load(open(item_name, "rb"))
                 dpt = data['depth']
                 rgb = data['rgb']
@@ -212,7 +226,7 @@ class LM_Dataset():
                     if self.add_noise:
                         ri = self.trancolor(ri)
                     rgb = np.array(ri)[:, :, :3]
-                meta = self.meta_lst[int(item_name)]
+                meta = self.meta_lst[int(item_name)]    # meta 指的是
                 if self.cls_id == 2:
                     for i in range(0, len(meta)):
                         if meta[i]['obj_id'] == 2:
@@ -242,6 +256,7 @@ class LM_Dataset():
             rgb = np.transpose(rgb, (2, 0, 1)) # hwc2chw
             cld, choose = self.bs_utils.dpt_2_cld(dpt, cam_scale, K)
 
+
             labels = labels.flatten()[choose]
             rgb_lst = []
             for ic in range(rgb.shape[0]):
@@ -266,8 +281,10 @@ class LM_Dataset():
             cld_rgb = np.concatenate((cld, rgb_pt), axis=1)
             cld_rgb = cld_rgb[choose_2, :]
             cld = cld[choose_2, :]
+
             normal = self.get_normal(cld)[:, :3]
             normal[np.isnan(normal)] = 0.0
+
             cld_rgb_nrm = np.concatenate((cld_rgb, normal), axis=1)
             choose = choose[:, choose_2]
             labels = labels[choose_2].astype(np.int32)
@@ -342,11 +359,11 @@ class LM_Dataset():
     def __len__(self):
         return len(self.all_lst)
 
-    def __getitem__(self, idx):
+    def __getitem__(self, idx):     # 调用函数实例时传入
         if self.dataset_name == 'train':
-            item_name = self.real_syn_gen()
-            data = self.get_item(item_name)
-            while data is None:
+            item_name = self.real_syn_gen()     # 物品的名称
+            data = self.get_item(item_name)     # 获得物品的数据
+            while data is None:                 # 如果没有成功获得物品的数据,循环执行上述两步,直到获得数据
                 item_name = self.real_syn_gen()
                 data = self.get_item(item_name)
             return data
