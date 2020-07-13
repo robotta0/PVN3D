@@ -152,7 +152,6 @@ dependencies:
     - plyfile==0.7.2
     - prometheus-client==0.8.0
     - pyrsistent==0.16.0
-    - python-pcl==0.3.0a1
     - pyzmq==19.0.1
     - scikit-learn==0.23.1
     - send2trash==1.5.0
