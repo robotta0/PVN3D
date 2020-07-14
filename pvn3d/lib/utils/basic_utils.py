@@ -382,11 +382,11 @@ class Basic_Utils():
         if len(dpt.shape) > 2:
             dpt = dpt[:, :, 0]
         msk_dp = dpt > 1e-6
-        choose = msk_dp.flatten().nonzero()[0].astype(np.uint32)
+        choose = msk_dp.flatten().nonzero()[0].astype(np.uint32)    # choose : 不为0的深度值的索引
         if len(choose) < 1:
             return None, None
 
-        dpt_mskd = dpt.flatten()[choose][:, np.newaxis].astype(np.float32)
+        dpt_mskd = dpt.flatten()[choose][:, np.newaxis].astype(np.float32)  # 不为0的深度值
         xmap_mskd = self.xmap.flatten()[choose][:, np.newaxis].astype(np.float32)
         ymap_mskd = self.ymap.flatten()[choose][:, np.newaxis].astype(np.float32)
 

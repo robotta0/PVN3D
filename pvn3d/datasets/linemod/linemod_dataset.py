@@ -3,7 +3,6 @@ import os
 
 import cv2
 
-
 import torch
 import os.path
 import numpy as np
@@ -14,6 +13,7 @@ import pickle as pkl
 from pvn3d.lib.utils.basic_utils import Basic_Utils
 import yaml
 from cv2 import imshow, waitKey
+
 # import open3d as o3d
 # __all__ = [o3d]
 
@@ -59,7 +59,7 @@ class LM_Dataset():
             )
             try:
                 self.fuse_lst = self.bs_utils.read_lines(fuse_img_pth)
-            except: # no fuse dataset
+            except:  # no fuse dataset
                 self.fuse_lst = self.rnd_lst
             self.all_lst = self.real_lst + self.rnd_lst + self.fuse_lst
         else:
@@ -80,9 +80,9 @@ class LM_Dataset():
         print("{}_dataset_size: ".format(dataset_name), len(self.all_lst))
 
     def real_syn_gen(self, real_ratio=1.0):
-        if self.rng.rand() < real_ratio: # self.rng = np.random
-            n_imgs = len(self.real_lst) # 真实数据的数量
-            idx = self.rng.randint(0, n_imgs)   # 将idx设置为0-n_imgs之间的整数
+        if self.rng.rand() < real_ratio:  # self.rng = np.random
+            n_imgs = len(self.real_lst)  # 真实数据的数量
+            idx = self.rng.randint(0, n_imgs)  # 将idx设置为0-n_imgs之间的整数
             pth = self.real_lst[idx]
             return pth
         else:
@@ -101,7 +101,7 @@ class LM_Dataset():
         return item
 
     def rand_range(self, rng, lo, hi):
-        return rng.rand()*(hi-lo)+lo
+        return rng.rand() * (hi - lo) + lo
 
     def gaussian_noise(self, rng, img, sigma):
         """add gaussian noise of given sigma to image"""
@@ -133,8 +133,8 @@ class LM_Dataset():
         # apply HSV augmentor
         if rng.rand() > 0:
             hsv_img = cv2.cvtColor(img, cv2.COLOR_BGR2HSV).astype(np.uint16)
-            hsv_img[:, : ,1] = hsv_img[:, :, 1] * self.rand_range(rng, 1-0.25, 1+.25)
-            hsv_img[:, :, 2] = hsv_img[:, :, 2] * self.rand_range(rng, 1-.15, 1+.15)
+            hsv_img[:, :, 1] = hsv_img[:, :, 1] * self.rand_range(rng, 1 - 0.25, 1 + .25)
+            hsv_img[:, :, 2] = hsv_img[:, :, 2] * self.rand_range(rng, 1 - .15, 1 + .15)
             hsv_img[:, :, 1] = np.clip(hsv_img[:, :, 1], 0, 255)
             hsv_img[:, :, 2] = np.clip(hsv_img[:, :, 2], 0, 255)
             img = cv2.cvtColor(hsv_img.astype(np.uint8), cv2.COLOR_HSV2BGR)
@@ -168,12 +168,12 @@ class LM_Dataset():
         cldShape = cld.shape
         normal = np.random.random(cldShape)
         return normal
-        #cloud = o3d.geometry.PointCloud()
-        #cld = cld.astype(np.float32)
-        #cloud.points = o3d.utility.Vector3dVector(cld)
+        # cloud = o3d.geometry.PointCloud()
+        # cld = cld.astype(np.float32)
+        # cloud.points = o3d.utility.Vector3dVector(cld)
         # o3d.geometry.estimate_normals(cloud,
         #                              search_param=o3d.geometry.KDTreeSearchParamKNN(50))
-        #print(cloud.normals)
+        # print(cloud.normals)
 
     def add_real_back(self, rgb, labels, dpt, dpt_msk):
         real_item = self.real_gen()
@@ -195,15 +195,15 @@ class LM_Dataset():
         msk_back = (labels <= 0).astype(rgb.dtype)
         msk_back = np.repeat(msk_back[:, :, None], 3, 2)
         imshow("msk_back", msk_back)
-        rgb = rgb * (msk_back==0).astype(rgb.dtype) + back * msk_back
+        rgb = rgb * (msk_back == 0).astype(rgb.dtype) + back * msk_back
 
         dpt = dpt * (dpt_msk > 0).astype(dpt.dtype) + \
-            dpt_back * (dpt_msk <=0).astype(dpt.dtype)
+              dpt_back * (dpt_msk <= 0).astype(dpt.dtype)
         return rgb, dpt
 
     def get_item(self, item_name):
-        try:        # 如果try中的语句块出现异常,执行except中的内容
-            if "pkl" in item_name:      #
+        try:  # 如果try中的语句块出现异常,执行except中的内容
+            if "pkl" in item_name:  #
                 data = pkl.load(open(item_name, "rb"))
                 dpt = data['depth']
                 rgb = data['rgb']
@@ -226,7 +226,7 @@ class LM_Dataset():
                     if self.add_noise:
                         ri = self.trancolor(ri)
                     rgb = np.array(ri)[:, :, :3]
-                meta = self.meta_lst[int(item_name)]    # meta 指的是
+                meta = self.meta_lst[int(item_name)]  # meta 指的是
                 if self.cls_id == 2:
                     for i in range(0, len(meta)):
                         if meta[i]['obj_id'] == 2:
@@ -253,11 +253,11 @@ class LM_Dataset():
                 if self.rng.rand() > 0.8:
                     rgb = self.rgb_add_noise(rgb)
 
-            rgb = np.transpose(rgb, (2, 0, 1)) # hwc2chw
-            cld, choose = self.bs_utils.dpt_2_cld(dpt, cam_scale, K)
+            rgb = np.transpose(rgb, (2, 0, 1))  # hwc2chw
+            cld, choose = self.bs_utils.dpt_2_cld(dpt, cam_scale, K)  # k:内参, cam_scale: 设置为1.0,不知道什么含义
+            # choose : 深度图中不为0的像素的索引
 
-
-            labels = labels.flatten()[choose]
+            labels = labels.flatten()[choose]  # labels : mask
             rgb_lst = []
             for ic in range(rgb.shape[0]):
                 rgb_lst.append(
@@ -268,15 +268,15 @@ class LM_Dataset():
             choose = np.array([choose])
             choose_2 = np.array([i for i in range(len(choose[0, :]))])
 
-            if len(choose_2) < 400:
+            if len(choose_2) < 400:  # 如果场景中点云的数量过少,返回None
                 return None
             if len(choose_2) > self.config.n_sample_points:
                 c_mask = np.zeros(len(choose_2), dtype=int)
                 c_mask[:self.config.n_sample_points] = 1
                 np.random.shuffle(c_mask)
-                choose_2 = choose_2[c_mask.nonzero()]
+                choose_2 = choose_2[c_mask.nonzero()]  # c_mask: 随机的0 1 组成的数组,choose_2:用于降采样
             else:
-                choose_2 = np.pad(choose_2, (0, self.config.n_sample_points-len(choose_2)), 'wrap')
+                choose_2 = np.pad(choose_2, (0, self.config.n_sample_points - len(choose_2)), 'wrap')
 
             cld_rgb = np.concatenate((cld, rgb_pt), axis=1)
             cld_rgb = cld_rgb[choose_2, :]
@@ -286,7 +286,7 @@ class LM_Dataset():
             normal[np.isnan(normal)] = 0.0
 
             cld_rgb_nrm = np.concatenate((cld_rgb, normal), axis=1)
-            choose = choose[:, choose_2]
+            choose = choose[:, choose_2]  # 降采样后的像素对应的原图上的索引
             labels = labels[choose_2].astype(np.int32)
 
             RTs = np.zeros((self.config.n_objects, 3, 4))
@@ -305,8 +305,8 @@ class LM_Dataset():
                 ctr3ds[i, :] = ctr[0]
                 msk_idx = np.where(labels == cls_id)[0]
 
-                target_offset = np.array(np.add(cld, -1.0*ctr3ds[i, :]))
-                ctr_targ_ofst[msk_idx,:] = target_offset[msk_idx, :]
+                target_offset = np.array(np.add(cld, -1.0 * ctr3ds[i, :]))
+                ctr_targ_ofst[msk_idx, :] = target_offset[msk_idx, :]
                 cls_ids[i, :] = np.array([1])
 
                 key_kpts = ''
@@ -322,48 +322,49 @@ class LM_Dataset():
 
                 target = []
                 for kp in kps:
-                    target.append(np.add(cld, -1.0*kp))
+                    target.append(np.add(cld, -1.0 * kp))
                 target_offset = np.array(target).transpose(1, 0, 2)  # [npts, nkps, c]
                 kp_targ_ofst[msk_idx, :, :] = target_offset[msk_idx, :, :]
 
             # rgb, pcld, cld_rgb_nrm, choose, kp_targ_ofst, ctr_targ_ofst, cls_ids, RTs, labels, kp_3ds, ctr_3ds
             if DEBUG:
-                return  torch.from_numpy(rgb.astype(np.float32)), \
-                        torch.from_numpy(cld.astype(np.float32)), \
-                        torch.from_numpy(cld_rgb_nrm.astype(np.float32)), \
-                        torch.LongTensor(choose.astype(np.int32)), \
-                        torch.from_numpy(kp_targ_ofst.astype(np.float32)), \
-                        torch.from_numpy(ctr_targ_ofst.astype(np.float32)), \
-                        torch.LongTensor(cls_ids.astype(np.int32)), \
-                        torch.from_numpy(RTs.astype(np.float32)), \
-                        torch.LongTensor(labels.astype(np.int32)), \
-                        torch.from_numpy(kp3ds.astype(np.float32)), \
-                        torch.from_numpy(ctr3ds.astype(np.float32)), \
-                        torch.from_numpy(K.astype(np.float32)), \
-                        torch.from_numpy(np.array(cam_scale).astype(np.float32))
+                return torch.from_numpy(rgb.astype(np.float32)), \
+                       torch.from_numpy(cld.astype(np.float32)), \
+                       torch.from_numpy(cld_rgb_nrm.astype(np.float32)), \
+                       torch.LongTensor(choose.astype(np.int32)), \
+                       torch.from_numpy(kp_targ_ofst.astype(np.float32)), \
+                       torch.from_numpy(ctr_targ_ofst.astype(np.float32)), \
+                       torch.LongTensor(cls_ids.astype(np.int32)), \
+                       torch.from_numpy(RTs.astype(np.float32)), \
+                       torch.LongTensor(labels.astype(np.int32)), \
+                       torch.from_numpy(kp3ds.astype(np.float32)), \
+                       torch.from_numpy(ctr3ds.astype(np.float32)), \
+                       torch.from_numpy(K.astype(np.float32)), \
+                       torch.from_numpy(np.array(cam_scale).astype(np.float32))
 
-            return  torch.from_numpy(rgb.astype(np.float32)), \
-                    torch.from_numpy(cld.astype(np.float32)), \
-                    torch.from_numpy(cld_rgb_nrm.astype(np.float32)), \
-                    torch.LongTensor(choose.astype(np.int32)), \
-                    torch.from_numpy(kp_targ_ofst.astype(np.float32)), \
-                    torch.from_numpy(ctr_targ_ofst.astype(np.float32)), \
-                    torch.LongTensor(cls_ids.astype(np.int32)), \
-                    torch.from_numpy(RTs.astype(np.float32)), \
-                    torch.LongTensor(labels.astype(np.int32)), \
-                    torch.from_numpy(kp3ds.astype(np.float32)), \
-                    torch.from_numpy(ctr3ds.astype(np.float32)),
+            # choose: 降采样后的点对应的原深度图上的索引
+            return torch.from_numpy(rgb.astype(np.float32)), \
+                   torch.from_numpy(cld.astype(np.float32)), \
+                   torch.from_numpy(cld_rgb_nrm.astype(np.float32)), \
+                   torch.LongTensor(choose.astype(np.int32)), \
+                   torch.from_numpy(kp_targ_ofst.astype(np.float32)), \
+                   torch.from_numpy(ctr_targ_ofst.astype(np.float32)), \
+                   torch.LongTensor(cls_ids.astype(np.int32)), \
+                   torch.from_numpy(RTs.astype(np.float32)), \
+                   torch.LongTensor(labels.astype(np.int32)), \
+                   torch.from_numpy(kp3ds.astype(np.float32)), \
+                   torch.from_numpy(ctr3ds.astype(np.float32)),
         except:
             return None
 
     def __len__(self):
         return len(self.all_lst)
 
-    def __getitem__(self, idx):     # 调用函数实例时传入
+    def __getitem__(self, idx):  # 调用函数实例时传入
         if self.dataset_name == 'train':
-            item_name = self.real_syn_gen()     # 物品的名称
-            data = self.get_item(item_name)     # 获得物品的数据
-            while data is None:                 # 如果没有成功获得物品的数据,循环执行上述两步,直到获得数据
+            item_name = self.real_syn_gen()  # 物品的名称
+            data = self.get_item(item_name)  # 获得物品的数据
+            while data is None:  # 如果没有成功获得物品的数据,循环执行上述两步,直到获得数据
                 item_name = self.real_syn_gen()
                 data = self.get_item(item_name)
             return data
@@ -397,10 +398,10 @@ def main():
             idx[cat] += 1
             datum = [item.numpy() for item in datum]
             rgb, pcld, cld_rgb_nrm, choose, kp_targ_ofst, \
-                ctr_targ_ofst, cls_ids, RTs, labels, kp3ds, ctr3ds, K, cam_scale = datum
+            ctr_targ_ofst, cls_ids, RTs, labels, kp3ds, ctr3ds, K, cam_scale = datum
             nrm_map = bs_utils.get_normal_map(cld_rgb_nrm[:, 6:], choose[0])
             imshow('nrm_map', nrm_map)
-            rgb = rgb.transpose(1, 2, 0) # [...,::-1].copy()
+            rgb = rgb.transpose(1, 2, 0)  # [...,::-1].copy()
             for i in range(22):
                 p2ds = bs_utils.project_p3d(pcld, cam_scale, K)
                 # rgb = self.bs_utils.draw_p2ds(rgb, p2ds)
@@ -409,12 +410,12 @@ def main():
                     break
                 kp_2ds = bs_utils.project_p3d(kp3d, cam_scale, K)
                 rgb = bs_utils.draw_p2ds(
-                    rgb, kp_2ds, 3, (0, 0, 255) # bs_utils.get_label_color(cls_ids[i], mode=1)
+                    rgb, kp_2ds, 3, (0, 0, 255)  # bs_utils.get_label_color(cls_ids[i], mode=1)
                 )
                 ctr3d = ctr3ds[i]
                 ctr_2ds = bs_utils.project_p3d(ctr3d[None, :], cam_scale, K)
                 rgb = bs_utils.draw_p2ds(
-                    rgb, ctr_2ds, 4, (255, 0, 0) # bs_utils.get_label_color(cls_ids[i], mode=1)
+                    rgb, ctr_2ds, 4, (255, 0, 0)  # bs_utils.get_label_color(cls_ids[i], mode=1)
                 )
             imshow('{}_rgb'.format(cat), rgb)
             cmd = waitKey(0)
